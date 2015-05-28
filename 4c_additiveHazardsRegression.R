@@ -74,7 +74,7 @@ print(paste("p value: ",pvalue," c-index: ",cindex[1]," correlation: ",correlati
 # Generate results for test set #
 #################################
 
-fit <- fitModel(train_survivalTime,train_status,features[train_ids,selected_features])
+fit <- fitAdditiveModel(train_survivalTime,train_status,features[train_ids,selected_features])
 toPredict <- list(time=rep(NA,383),status=rep(NA,383),x=features[,selected_features])
 prediction <- predict(fit,toPredict)
 meta_patients[,"Prediction"] <- prediction

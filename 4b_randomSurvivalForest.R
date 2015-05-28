@@ -19,8 +19,8 @@ fitModel <- function(survivalTime,status,features){
 }
 
 fitRFModel <- function(survivalTime,status,features){
-  data <- list(time=survivalTime,status=status,x=features)
-  fit <- rfsrc(Surv(time,status)~., as.data.frame(data), ntree=500, forest=T, na.action="na.impute", seed=12345)
+  data <- data.frame(features)
+  fit <- rfsrc(Surv(time,status)~., data, ntree=500, forest=T, na.action="na.impute", seed=12345)
   return(fit)
 }
 
@@ -57,8 +57,8 @@ for (i in train_ids) {
   
   fit <- fitRFModel(train_survivalTime[fold],train_status[fold],features[fold,selected_features])
   
-  toPredict <- list(time=train_survivalTime[i],status=train_status[i],x=features[i,selected_features,drop=F])
-  predictedvalue <- predict(fit,as.data.frame(toPredict), na.action="na.impute")
+  toPredict <- data.frame(x=features[i,selected_features,drop=F])
+  predictedvalue <- predict(fit,toPredict, na.action="na.impute")
   prediction <- c(prediction,predictedvalue$predicted)
   
   print(paste(i,train_survivalTime[i],prediction[i]))
@@ -78,8 +78,8 @@ print(paste("p value: ",pvalue," c-index: ",cindex[1]," correlation: ",correlati
 #################################
 
 fit <- fitRFModel(train_survivalTime,train_status,features[train_ids,selected_features])
-toPredict <- list(time=rep(NA,383),status=rep(NA,383),x=features[,selected_features])
-prediction <- predict(fit,as.data.frame(toPredict), na.action="na.impute")
+toPredict <- data.frame(features[,selected_features])
+prediction <- predict(fit,toPredict, na.action="na.impute")
 meta_patients[,"Prediction"] <- prediction$predicted
 write.csv(meta_patients,file=paste(FCSloc,"dambi","predictionRandomSurvivalForest.csv",sep="/"))
 print(paste("Predictions on training and test set are written to ",paste(FCSloc,"dambi","predictionRandomSurvivalForest.csv",sep="/"),sep=""))
